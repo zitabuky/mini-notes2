@@ -190,6 +190,56 @@
     applyTheme();
     load();
     render();
-  </script>
+  </script><script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import {
+    getFirestore, collection, addDoc, deleteDoc, updateDoc, doc,
+    onSnapshot, query, orderBy, enableIndexedDbPersistence
+  } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+  // A TE webappod Firebase konfigurációja (amit most látsz a konzolon)
+  const firebaseConfig = {
+    apiKey: "AIzaSyAdJ5cSpgyk1DhlLqFhKeSHFCamrQHS7Ko",
+    authDomain: "mini-notes-266b2.firebaseapp.com",
+    projectId: "mini-notes-266b2",
+    storageBucket: "mini-notes-266b2.firebasestorage.app",
+    messagingSenderId: "859437610641",
+    appId: "1:859437610641:web:7cd2a7447800954120b130"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  enableIndexedDbPersistence(db).catch(()=>{}); // offline cache engedélyezés
+
+  // MAGYAR elnevezések: 'jegyzetek' gyűjtemény, 'szöveg' mező
+  const coll = collection(db, "jegyzetek");
+  const q = query(coll, orderBy("ts", "desc"));
+
+  // Firestore -> UI (élő szinkron)
+  onSnapshot(q, (snap) => {
+    state.notes = snap.docs.map(d => {
+      const data = d.data();
+      return { id: d.id, text: data.szöveg, ts: data.ts };
+    });
+    render();
+  });
+
+  // UI -> Firestore (a lokál függvényeket felülírjuk felhőssé)
+  window.addNote = async (text) => {
+    text = (text || "").trim(); if (!text) return;
+    await addDoc(coll, { szöveg: text, ts: Date.now() });
+    document.getElementById('input').value = '';
+    document.getElementById('input').focus();
+  };
+  window.updateNote = async (id, newText) =>
+    updateDoc(doc(db, "jegyzetek", id), { szöveg: (newText || "").trim() });
+  window.deleteNote = async (id) =>
+    deleteDoc(doc(db, "jegyzetek", id));
+  window.clearAll = async () => {
+    if (!confirm('Biztosan törlöd az összes jegyzetet?')) return;
+    await Promise.all(state.notes.map(n => deleteDoc(doc(db, "jegyzetek", n.id))));
+  };
+</script>
 </body>
 </html>
+
