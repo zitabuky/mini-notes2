@@ -13,57 +13,64 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg:#0f172a;       /* slate-900 */
-      --panel:#111827;    /* gray-900 */
-      --card:#0b1220;     /* deep */
-      --muted:#9ca3af;    /* gray-400 */
-      --text:#e5e7eb;     /* gray-200 */
-      --brand:#22c55e;    /* green-500 */
-      --danger:#ef4444;   /* red-500 */
+      /* Dark (alap) */
+      --bg:#0f172a;       /* háttér 1 */
+      --bg2:#0b1220;      /* háttér 2 */
+      --panel:#111827;    /* panel */
+      --card:#0b1220;     /* kártya */
+      --muted:#9ca3af;    /* halvány szöveg */
+      --text:#e5e7eb;     /* fő szöveg */
+      --brand:#22c55e;    /* gomb szín */
+      --danger:#ef4444;   /* veszély */
+      --border: rgba(255,255,255,.08);
       --shadow: 0 10px 30px rgba(0,0,0,.35);
       --radius: 18px;
     }
     /* Light mód változók */
     body.light{
-      --bg:#f8fafc;       /* slate-50 */
-      --bg2:#eef2ff;      /* indigo-50 */
+      --bg:#f8fafc;       /* világos háttér */
+      --bg2:#eef2ff;      /* átmenet */
       --panel:#ffffff;
       --card:#ffffff;
-      --muted:#475569;    /* slate-600 */
-      --text:#0f172a;     /* slate-900 */
-      --brand:#16a34a;    /* green-600 */
+      --muted:#475569;
+      --text:#0f172a;
+      --brand:#16a34a;
       --danger:#dc2626;
       --border: rgba(2,6,23,.08);
     }
     *{box-sizing:border-box}
     html,body{height:100%}
-    body{margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Arial; background:linear-gradient(120deg,var(--bg2),var(--bg) 40%,var(--bg2)); color:var(--text); display:grid; place-items:start center; padding:48px 16px}
+    body{
+      margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
+      background:linear-gradient(120deg,var(--bg2),var(--bg) 40%,var(--bg2));
+      color:var(--text); display:grid; place-items:start center; padding:48px 16px;
+    }
     .app{width:min(980px,100%)}
     header{display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:22px}
     h1{font-size:clamp(24px,3vw,36px); margin:0; letter-spacing:.3px}
     .subtitle{color:var(--muted); font-size:14px}
-    .board{background:rgba(255,255,255,.02); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius); box-shadow:var(--shadow); padding:20px}
-    .board, .search, textarea, .iconbtn, .btn.secondary{border:1px solid var(--border)}
+    .board{background:rgba(255,255,255,.02); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); padding:20px}
     .composer{display:flex; gap:12px; margin-bottom:16px}
-    textarea{flex:1; resize:vertical; min-height:76px; max-height:220px; padding:14px 16px; border-radius:14px; border:1px solid rgba(255,255,255,.08); background:var(--panel); color:var(--text); outline:none; box-shadow:inset 0 0 0 1px rgba(255,255,255,.02)}
+    textarea{flex:1; resize:vertical; min-height:76px; max-height:220px; padding:14px 16px; border-radius:14px; border:1px solid var(--border); background:var(--panel); color:var(--text); outline:none; box-shadow:inset 0 0 0 1px rgba(255,255,255,.02)}
     .row{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
     .btn{appearance:none; border:none; padding:12px 16px; border-radius:14px; cursor:pointer; font-weight:600; background:var(--brand); color:#03120a; transition:.15s transform,.15s filter; box-shadow:0 8px 18px rgba(34,197,94,.25)}
     .btn[disabled]{filter:grayscale(1) brightness(.8); cursor:not-allowed}
-    .btn.secondary{background:#1f2937; color:#d1d5db; box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
-    .search{margin-left:auto; display:flex; align-items:center; gap:8px; background:#0d1526; padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.08)}
+    .btn.secondary{background:#1f2937; color:#d1d5db; box-shadow:inset 0 0 0 1px var(--border); border:1px solid var(--border)}
+    .search{margin-left:auto; display:flex; align-items:center; gap:8px; background:#0d1526; padding:10px 12px; border-radius:12px; border:1px solid var(--border)}
+    body.light .search{background:#ffffff}
     .search input{background:transparent; border:none; outline:none; color:var(--text); min-width:180px}
     .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:14px}
-    .card{background:var(--card); border:1px solid rgba(255,255,255,.06); border-radius:16px; padding:14px; display:flex; flex-direction:column; gap:12px; position:relative}
+    .card{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:14px; display:flex; flex-direction:column; gap:12px; position:relative}
     .badge{font-size:12px; color:#a3e635; background:rgba(163,230,53,.08); padding:4px 8px; border-radius:999px; width:max-content}
     .note{white-space:pre-wrap; line-height:1.45}
     .meta{display:flex; justify-content:space-between; align-items:center; gap:8px; color:var(--muted); font-size:12px}
     .actions{display:flex; gap:8px}
-    .iconbtn{background:#111827; border:1px solid rgba(255,255,255,.08); color:#e5e7eb; border-radius:10px; padding:8px 10px; cursor:pointer}
+    .iconbtn{background:#111827; border:1px solid var(--border); color:#e5e7eb; border-radius:10px; padding:8px 10px; cursor:pointer}
+    body.light .iconbtn{background:#ffffff; color:#0f172a}
     .iconbtn.danger{background:#1b0f12; border-color:rgba(239,68,68,.35); color:#fecaca}
     .empty{padding:30px; text-align:center; color:var(--muted)}
     footer{margin-top:18px; color:var(--muted); font-size:12px; text-align:center}
     a{color:#86efac}
-    /* Install gomb */
     .install{position:fixed; right:18px; bottom:18px; display:none}
   </style>
 </head>
@@ -74,11 +81,13 @@
         <h1>Mini Notes</h1>
         <div class="subtitle">Egyszerű jegyzet-app <strong>localStorage</strong>-szal. PWA-ként telepíthető.</div>
       </div>
-      <div class="search" title="Keresés a jegyzetek között">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 21l-3.8-3.8" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/><circle cx="11" cy="11" r="7" stroke="#9ca3af" stroke-width="2"/></svg>
-        <input id="q" placeholder="Keresés... (Ctrl+/)" />
+      <div style="display:flex; align-items:center; gap:8px; margin-left:auto">
+        <div class="search" title="Keresés a jegyzetek között">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 21l-3.8-3.8" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/><circle cx="11" cy="11" r="7" stroke="#9ca3af" stroke-width="2"/></svg>
+          <input id="q" placeholder="Keresés... (Ctrl+/)" />
+        </div>
+        <button id="themeBtn" class="btn secondary" title="Téma váltása">🌙 Sötét mód</button>
       </div>
-    <button id="themeBtn" class="btn secondary" title="Téma váltása" style="margin-left:8px">🌙 Sötét mód</button>
     </header>
 
     <section class="board">
@@ -100,12 +109,10 @@
     <footer>Made with ♥ – tanuló projekt. Forráskód a böngészőben fut.</footer>
   </div>
 
-  <!-- Telepítés gomb (A2HS) -->
   <button id="installBtn" class="btn install">Telepítés a kezdőképernyőre</button>
 
   <script>
-    // --- Egyszerű állapotkezelés localStorage-szal ---
-    // TÉMA KEZELÉS
+    // --- TÉMA KEZELÉS ---
     const THEME_KEY = 'mini-notes:theme';
     const mTheme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
     function applyTheme(t){
@@ -118,39 +125,33 @@
       if(meta){ meta.setAttribute('content', getComputedStyle(document.body).getPropertyValue('--bg').trim()); }
       return theme;
     }
-    function toggleTheme(){ const current = localStorage.getItem(THEME_KEY) || (mTheme && mTheme.matches ? 'dark' : 'light'); applyTheme(current==='light' ? 'dark' : 'light'); }
+    function toggleTheme(){
+      const current = localStorage.getItem(THEME_KEY) || (mTheme && mTheme.matches ? 'dark' : 'light');
+      applyTheme(current==='light' ? 'dark' : 'light');
+    }
+
+    // --- Alap állapot ---
     const LS_KEY = 'mini-notes:v1';
     const $ = sel => document.querySelector(sel);
-
     const state = { notes: [], query: '', deferredPrompt: null };
 
     function load(){
       try{ state.notes = JSON.parse(localStorage.getItem(LS_KEY)) || []; }
       catch(e){ state.notes = []; }
     }
-
-    function save(){
-      localStorage.setItem(LS_KEY, JSON.stringify(state.notes));
-      render();
-    }
-
-    function addNote(text){
-      text = (text||'').trim(); if(!text) return;
-      state.notes.unshift({ id: crypto.randomUUID(), text, ts: Date.now() });
-      save(); $('#input').value=''; $('#input').focus();
-    }
-
-    function updateNote(id, newText){ const n = state.notes.find(n => n.id===id); if(!n) return; n.text = newText.trim(); save(); }
-    function deleteNote(id){ state.notes = state.notes.filter(n => n.id!==id); save(); }
+    function save(){ localStorage.setItem(LS_KEY, JSON.stringify(state.notes)); render(); }
+    function addNote(text){ text=(text||'').trim(); if(!text) return; state.notes.unshift({ id: crypto.randomUUID(), text, ts: Date.now() }); save(); $('#input').value=''; $('#input').focus(); }
+    function updateNote(id, newText){ const n = state.notes.find(n=>n.id===id); if(!n) return; n.text = newText.trim(); save(); }
+    function deleteNote(id){ state.notes = state.notes.filter(n=>n.id!==id); save(); }
     function clearAll(){ if(confirm('Biztosan törlöd az összes jegyzetet?')){ state.notes = []; save(); } }
-    function formatDate(ts){ const d = new Date(ts); return d.toLocaleString('hu-HU',{dateStyle:'medium', timeStyle:'short'}); }
-    function filtered(){ const q = state.query.toLowerCase(); return !q ? state.notes : state.notes.filter(n => n.text.toLowerCase().includes(q)); }
+    function formatDate(ts){ const d=new Date(ts); return d.toLocaleString('hu-HU',{dateStyle:'medium', timeStyle:'short'}); }
+    function filtered(){ const q=state.query.toLowerCase(); return !q? state.notes : state.notes.filter(n=> n.text.toLowerCase().includes(q)); }
 
     function render(){
       const notes = filtered();
       $('#count').textContent = `${notes.length} jegyzet`;
       $('#empty').hidden = notes.length !== 0;
-      const html = notes.map(n => `
+      const html = notes.map(n=>`
         <article class="card" data-id="${n.id}">
           <span class="badge">#${state.notes.indexOf(n)+1}</span>
           <div class="note" contenteditable="true" spellcheck="true">${n.text.replace(/</g,'&lt;')}</div>
@@ -172,27 +173,17 @@
     $('#input').addEventListener('keydown', (e)=>{ if(e.key==='Enter' && (e.ctrlKey||e.metaKey)){ addNote($('#input').value); } });
     $('#q').addEventListener('input', e=>{ state.query = e.target.value; render(); });
     document.addEventListener('keydown', (e)=>{ if(e.key==='/' && (e.ctrlKey||e.metaKey)){ e.preventDefault(); $('#q').focus(); } });
-
-    $('#list').addEventListener('input', (e)=>{ const art = e.target.closest('.card'); if(!art) return; if(e.target.classList.contains('note')){ updateNote(art.dataset.id, e.target.textContent); } });
+    $('#list').addEventListener('input', (e)=>{ const art=e.target.closest('.card'); if(!art) return; if(e.target.classList.contains('note')){ updateNote(art.dataset.id, e.target.textContent); } });
     $('#list').addEventListener('click', async (e)=>{
-      const btn = e.target.closest('button'); if(!btn) return; const art = btn.closest('.card'); const id = art.dataset.id; const act = btn.dataset.act;
+      const btn=e.target.closest('button'); if(!btn) return; const art=btn.closest('.card'); const id=art.dataset.id; const act=btn.dataset.act;
       if(act==='del') deleteNote(id);
-      if(act==='copy'){ const text = art.querySelector('.note').textContent; try{ await navigator.clipboard.writeText(text); btn.textContent='Másolva ✓'; setTimeout(()=>btn.textContent='Másolás',1200);}catch{} }
+      if(act==='copy'){ const text=art.querySelector('.note').textContent; try{ await navigator.clipboard.writeText(text); btn.textContent='Másolva ✓'; setTimeout(()=>btn.textContent='Másolás',1200);}catch{} }
     });
 
-    // --- PWA: Service Worker regisztráció + A2HS gomb kezelése ---
+    // --- PWA: Service Worker + A2HS ---
     if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catch(()=>{}); }
-
     window.addEventListener('beforeinstallprompt', (e)=>{
-      e.preventDefault();
-      state.deferredPrompt = e;
-      const btn = document.getElementById('installBtn');
-      btn.style.display = 'inline-block';
-      btn.onclick = async ()=>{
-        btn.disabled = true;
-        if(state.deferredPrompt){ state.deferredPrompt.prompt(); const choice = await state.deferredPrompt.userChoice; state.deferredPrompt = null; }
-        btn.style.display = 'none';
-      };
+      e.preventDefault(); state.deferredPrompt = e; const btn=document.getElementById('installBtn'); btn.style.display='inline-block'; btn.onclick=async()=>{ btn.disabled=true; if(state.deferredPrompt){ state.deferredPrompt.prompt(); await state.deferredPrompt.userChoice; state.deferredPrompt=null;} btn.style.display='none'; };
     });
 
     // Init
@@ -200,58 +191,5 @@
     load();
     render();
   </script>
-
-  <!-- -----------------------------------------------
-       KIEGÉSZÍTŐ FÁJLOK (másold a projektbe):
-       1) manifest.webmanifest
-       2) sw.js
-       3) icons/icon-192.png, icons/icon-512.png (két PNG)
-       ----------------------------------------------- -->
-
-  <!-- manifest.webmanifest -->
-  <!--
-  {
-    "name": "Mini Notes",
-    "short_name": "Notes",
-    "start_url": ".",
-    "display": "standalone",
-    "background_color": "#0f172a",
-    "theme_color": "#0f172a",
-    "icons": [
-      { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-      { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
-    ]
-  }
-  -->
-
-  <!-- sw.js -->
-  <!--
-  const CACHE = 'mini-notes-v1';
-  const ASSETS = [
-    './',
-    './index.html',
-    './manifest.webmanifest',
-    './icons/icon-192.png',
-    './icons/icon-512.png'
-  ];
-  self.addEventListener('install', e=>{
-    e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)));
-    self.skipWaiting();
-  });
-  self.addEventListener('activate', e=>{
-    e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));
-    self.clients.claim();
-  });
-  self.addEventListener('fetch', e=>{
-    const {request} = e;
-    if(request.method !== 'GET') return;
-    e.respondWith(
-      caches.match(request).then(cached => cached || fetch(request).then(res=>{
-        const copy = res.clone(); caches.open(CACHE).then(c=>c.put(request, copy)); return res; }))
-      .catch(()=> caches.match('/index.html'))
-    );
-  });
-  -->
-
 </body>
 </html>
