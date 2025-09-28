@@ -191,7 +191,16 @@
     load();
     render();
   </script>
-    <script type="module">
+     <footer>Made with ♥ – tanuló projekt. Forráskód a böngészőben fut.</footer>
+</div>
+
+<button id="installBtn" class="btn install">Telepítés a kezdőképernyőre</button>
+
+<!-- A SAJÁT (nem modul) script BLOKK vége -->
+</script>
+
+<!-- Firebase SZINKRON – külön modul scriptként! -->
+<script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
   import {
     getFirestore, collection, addDoc, deleteDoc, updateDoc, doc,
@@ -212,20 +221,17 @@
   const db = getFirestore(app);
   enableIndexedDbPersistence(db).catch(()=>{}); // offline cache
 
-  // >>> Itt már a Firestore-odnak megfelelő ELNEVEZÉSEK vannak
+  // Firestore: 'notes' gyűjtemény, 'text' mező
   const coll = collection(db, "notes");
   const q = query(coll, orderBy("ts", "desc"));
 
-  // Firestore -> UI (élő szinkron)
+  // Firestore -> UI (élő)
   onSnapshot(q, (snap) => {
-    state.notes = snap.docs.map(d => {
-      const data = d.data();
-      return { id: d.id, text: data.text, ts: data.ts };
-    });
+    state.notes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     render();
   });
 
-  // UI -> Firestore
+  // UI -> Firestore (felülírjuk a lokál függvényeket)
   window.addNote = async (text) => {
     text = (text || "").trim(); if (!text) return;
     await addDoc(coll, { text, ts: Date.now() });
@@ -242,56 +248,8 @@
   };
 </script>
 
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-  import {
-    getFirestore, collection, addDoc, deleteDoc, updateDoc, doc,
-    onSnapshot, query, orderBy, enableIndexedDbPersistence
-  } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-
-  // A TE webappod Firebase konfigurációja (amit most látsz a konzolon)
-  const firebaseConfig = {
-    apiKey: "AIzaSyAdJ5cSpgyk1DhlLqFhKeSHFCamrQHS7Ko",
-    authDomain: "mini-notes-266b2.firebaseapp.com",
-    projectId: "mini-notes-266b2",
-    storageBucket: "mini-notes-266b2.firebasestorage.app",
-    messagingSenderId: "859437610641",
-    appId: "1:859437610641:web:7cd2a7447800954120b130"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  enableIndexedDbPersistence(db).catch(()=>{}); // offline cache engedélyezés
-
-  // MAGYAR elnevezések: 'jegyzetek' gyűjtemény, 'szöveg' mező
-  const coll = collection(db, "jegyzetek");
-  const q = query(coll, orderBy("ts", "desc"));
-
-  // Firestore -> UI (élő szinkron)
-  onSnapshot(q, (snap) => {
-    state.notes = snap.docs.map(d => {
-      const data = d.data();
-      return { id: d.id, text: data.szöveg, ts: data.ts };
-    });
-    render();
-  });
-
-  // UI -> Firestore (a lokál függvényeket felülírjuk felhőssé)
-  window.addNote = async (text) => {
-    text = (text || "").trim(); if (!text) return;
-    await addDoc(coll, { szöveg: text, ts: Date.now() });
-    document.getElementById('input').value = '';
-    document.getElementById('input').focus();
-  };
-  window.updateNote = async (id, newText) =>
-    updateDoc(doc(db, "jegyzetek", id), { szöveg: (newText || "").trim() });
-  window.deleteNote = async (id) =>
-    deleteDoc(doc(db, "jegyzetek", id));
-  window.clearAll = async () => {
-    if (!confirm('Biztosan törlöd az összes jegyzetet?')) return;
-    await Promise.all(state.notes.map(n => deleteDoc(doc(db, "jegyzetek", n.id))));
-  };
-</script>
 </body>
 </html>
+
 
 
