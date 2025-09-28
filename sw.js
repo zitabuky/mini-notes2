@@ -1,4 +1,4 @@
-const CACHE = 'mini-notes-v5';
+const CACHE = 'mini-notes-v6';
 const ASSETS = [
   './',
   './index.html',
@@ -35,4 +35,5 @@ self.addEventListener('fetch', e => {
     ).catch(() => caches.match('./index.html'))
   );
 });
+
 
