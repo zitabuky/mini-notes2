@@ -1,10 +1,10 @@
 const CACHE = 'mini-notes-v1';
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.webmanifest',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png'
+  './',
+  './index.html',
+  './manifest.webmanifest',
+  './icons/icon-192.png',
+  './icons/icon-512.png'
 ];
 
 self.addEventListener('install', event => {
@@ -38,3 +38,4 @@ self.addEventListener('fetch', event => {
     ).catch(() => caches.match('/index.html'))
   );
 });
+
