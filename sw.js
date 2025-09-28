@@ -1,4 +1,4 @@
-const CACHE = 'mini-notes-v1';
+const CACHE = 'mini-notes-v2'; // növelt verzió, hogy biztos frissüljön
 const ASSETS = [
   './',
   './index.html',
@@ -7,15 +7,13 @@ const ASSETS = [
   './icons/icon-512.png'
 ];
 
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE).then(cache => cache.addAll(ASSETS))
-  );
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
   self.skipWaiting();
 });
 
-self.addEventListener('activate', event => {
-  event.waitUntil(
+self.addEventListener('activate', e => {
+  e.waitUntil(
     caches.keys().then(keys =>
       Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
     )
@@ -23,19 +21,20 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
-self.addEventListener('fetch', event => {
-  const { request } = event;
+self.addEventListener('fetch', e => {
+  const { request } = e;
   if (request.method !== 'GET') return;
-
-  event.respondWith(
+  e.respondWith(
     caches.match(request).then(cached =>
       cached ||
       fetch(request).then(res => {
         const copy = res.clone();
-        caches.open(CACHE).then(cache => cache.put(request, copy));
+        caches.open(CACHE).then(c => c.put(request, copy));
         return res;
       })
-    ).catch(() => caches.match('/index.html'))
+    ).catch(() => caches.match('./index.html'))
   );
 });
+
+
 
