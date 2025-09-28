@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mini Notes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0f172a;       /* slate-900 */
+      --panel:#111827;    /* gray-900 */
+      --card:#0b1220;     /* deep */
+      --muted:#9ca3af;    /* gray-400 */
+      --text:#e5e7eb;     /* gray-200 */
+      --brand:#22c55e;    /* green-500 */
+      --danger:#ef4444;   /* red-500 */
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 18px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Arial; background:linear-gradient(120deg,#0b1220,#0f172a 40%,#0b1220);
+      color:var(--text); display:grid; place-items:start center; padding:48px 16px;
+    }
+    .app{width:min(980px,100%);}
+    header{
+      display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:22px;
+    }
+    h1{font-size:clamp(24px,3vw,36px); margin:0; letter-spacing:.3px}
+    .subtitle{color:var(--muted); font-size:14px}
+    .board{
+      background:rgba(255,255,255,.02); border:1px solid rgba(255,255,255,.08);
+      border-radius:var(--radius); box-shadow:var(--shadow); padding:20px;
+    }
+    .composer{display:flex; gap:12px; margin-bottom:16px}
+    textarea{
+      flex:1; resize:vertical; min-height:76px; max-height:220px; padding:14px 16px; border-radius:14px;
+      border:1px solid rgba(255,255,255,.08); background:var(--panel); color:var(--text);
+      outline:none; box-shadow:inset 0 0 0 1px rgba(255,255,255,.02);
+    }
+    .row{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+    .btn{
+      appearance:none; border:none; padding:12px 16px; border-radius:14px; cursor:pointer; font-weight:600;
+      background:var(--brand); color:#03120a; transition:.15s transform,.15s filter; box-shadow:0 8px 18px rgba(34,197,94,.25);
+    }
+    .btn[disabled]{filter:grayscale(1) brightness(.8); cursor:not-allowed}
+    .btn.secondary{background:#1f2937; color:#d1d5db; box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
+    .search{margin-left:auto; display:flex; align-items:center; gap:8px; background:#0d1526; padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.08)}
+    .search input{background:transparent; border:none; outline:none; color:var(--text); min-width:180px}
+    .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:14px}
+    .card{
+      background:var(--card); border:1px solid rgba(255,255,255,.06); border-radius:16px; padding:14px; display:flex; flex-direction:column; gap:12px; position:relative;
+    }
+    .badge{font-size:12px; color:#a3e635; background:rgba(163,230,53,.08); padding:4px 8px; border-radius:999px; width:max-content}
+    .note{white-space:pre-wrap; line-height:1.45}
+    .meta{display:flex; justify-content:space-between; align-items:center; gap:8px; color:var(--muted); font-size:12px}
+    .actions{display:flex; gap:8px}
+    .iconbtn{background:#111827; border:1px solid rgba(255,255,255,.08); color:#e5e7eb; border-radius:10px; padding:8px 10px; cursor:pointer}
+    .iconbtn.danger{background:#1b0f12; border-color:rgba(239,68,68,.35); color:#fecaca}
+    .empty{padding:30px; text-align:center; color:var(--muted)}
+    footer{margin-top:18px; color:var(--muted); font-size:12px; text-align:center}
+    a{color:#86efac}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div>
+        <h1>Mini Notes</h1>
+        <div class="subtitle">Egyszerű jegyzet-app <strong>localStorage</strong>-szal. Nincs backend, minden a böngészőben fut.</div>
+      </div>
+      <div class="search" title="Keresés a jegyzetek között">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 21l-3.8-3.8" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/><circle cx="11" cy="11" r="7" stroke="#9ca3af" stroke-width="2"/></svg>
+        <input id="q" placeholder="Keresés... (Ctrl+/)" />
+      </div>
+    </header>
+
+    <section class="board">
+      <div class="composer">
+        <textarea id="input" placeholder="Írj egy jegyzetet… (Ctrl+Enter a mentéshez)"></textarea>
+      </div>
+      <div class="row">
+        <button class="btn" id="add">+ Jegyzet mentése</button>
+        <button class="btn secondary" id="clear">Összes törlése</button>
+        <span class="subtitle" id="count"></span>
+      </div>
+    </section>
+
+    <section style="margin-top:16px">
+      <div id="list" class="grid"></div>
+      <div id="empty" class="empty" hidden>Még nincs jegyzet. Kezdd el fent, és itt fognak megjelenni. ✍️</div>
+    </section>
+
+    <footer>Made with ♥ – tanuló projekt. Forráskód a böngészőben fut.</footer>
+  </div>
+
+  <script>
+    // --- Egyszerű állapotkezelés localStorage-szal ---
+    const LS_KEY = 'mini-notes:v1';
+    const $ = sel => document.querySelector(sel);
+
+    const state = {
+      notes: [],
+      query: ''
+    };
+
+    function load(){
+      try{ state.notes = JSON.parse(localStorage.getItem(LS_KEY)) || []; }
+      catch(e){ state.notes = []; }
+    }
+
+    function save(){
+      localStorage.setItem(LS_KEY, JSON.stringify(state.notes));
+      render();
+    }
+
+    function addNote(text){
+      text = (text||'').trim();
+      if(!text) return;
+      state.notes.unshift({ id: crypto.randomUUID(), text, ts: Date.now() });
+      save();
+      $('#input').value='';
+      $('#input').focus();
+    }
+
+    function updateNote(id, newText){
+      const n = state.notes.find(n => n.id===id);
+      if(!n) return; n.text = newText.trim(); save();
+    }
+
+    function deleteNote(id){
+      state.notes = state.notes.filter(n => n.id!==id); save();
+    }
+
+    function clearAll(){
+      if(confirm('Biztosan törlöd az összes jegyzetet?')){ state.notes = []; save(); }
+    }
+
+    function formatDate(ts){
+      const d = new Date(ts);
+      return d.toLocaleString('hu-HU', { dateStyle:'medium', timeStyle:'short' });
+    }
+
+    function filtered(){
+      const q = state.query.toLowerCase();
+      return !q ? state.notes : state.notes.filter(n => n.text.toLowerCase().includes(q));
+    }
+
+    function render(){
+      const notes = filtered();
+      $('#count').textContent = `${notes.length} jegyzet`;
+      $('#empty').hidden = notes.length !== 0;
+      const html = notes.map(n => `
+        <article class="card" data-id="${n.id}">
+          <span class="badge">${new DOMParser().parseFromString('&num;'+(state.notes.indexOf(n)+1),'text/html').body.textContent}</span>
+          <div class="note" contenteditable="true" spellcheck="true">${n.text.replace(/</g,'&lt;')}</div>
+          <div class="meta">
+            <span>${formatDate(n.ts)}</span>
+            <div class="actions">
+              <button class="iconbtn" data-act="copy">Másolás</button>
+              <button class="iconbtn danger" data-act="del">Törlés</button>
+            </div>
+          </div>
+        </article>`).join('');
+      $('#list').innerHTML = html;
+    }
+
+    // Események
+    $('#add').addEventListener('click', () => addNote($('#input').value));
+    $('#clear').addEventListener('click', clearAll);
+    $('#input').addEventListener('keydown', (e)=>{
+      if(e.key==='Enter' && (e.ctrlKey||e.metaKey)){ addNote($('#input').value); }
+    });
+    $('#q').addEventListener('input', e=>{ state.query = e.target.value; render(); });
+    document.addEventListener('keydown', (e)=>{
+      if(e.key==='/' && (e.ctrlKey||e.metaKey)){ e.preventDefault(); $('#q').focus(); }
+    });
+
+    $('#list').addEventListener('input', (e)=>{
+      const art = e.target.closest('.card'); if(!art) return;
+      if(e.target.classList.contains('note')){ updateNote(art.dataset.id, e.target.textContent); }
+    });
+    $('#list').addEventListener('click', async (e)=>{
+      const btn = e.target.closest('button'); if(!btn) return;
+      const art = btn.closest('.card');
+      const id = art.dataset.id;
+      const act = btn.dataset.act;
+      if(act==='del') deleteNote(id);
+      if(act==='copy'){
+        const text = art.querySelector('.note').textContent;
+        try{ await navigator.clipboard.writeText(text); btn.textContent='Másolva ✓'; setTimeout(()=>btn.textContent='Másolás',1200);}catch{}
+      }
+    });
+
+    // Init
+    load();
+    render();
+  </script>
+</body>
+</html>
