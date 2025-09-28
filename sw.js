@@ -1,4 +1,4 @@
-const CACHE = 'mini-notes-v2'; // növelt verzió, hogy biztos frissüljön
+const CACHE = 'mini-notes-v5';
 const ASSETS = [
   './',
   './index.html',
@@ -35,3 +35,4 @@ self.addEventListener('fetch', e => {
     ).catch(() => caches.match('./index.html'))
   );
 });
+
