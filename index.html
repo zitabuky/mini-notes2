@@ -190,7 +190,58 @@
     applyTheme();
     load();
     render();
-  </script><script type="module">
+  </script>
+    <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import {
+    getFirestore, collection, addDoc, deleteDoc, updateDoc, doc,
+    onSnapshot, query, orderBy, enableIndexedDbPersistence
+  } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+  // A TE webappod Firebase konfigurációja
+  const firebaseConfig = {
+    apiKey: "AIzaSyAdJ5cSpgyk1DhlLqFhKeSHFCamrQHS7Ko",
+    authDomain: "mini-notes-266b2.firebaseapp.com",
+    projectId: "mini-notes-266b2",
+    storageBucket: "mini-notes-266b2.firebasestorage.app",
+    messagingSenderId: "859437610641",
+    appId: "1:859437610641:web:7cd2a7447800954120b130"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  enableIndexedDbPersistence(db).catch(()=>{}); // offline cache
+
+  // >>> Itt már a Firestore-odnak megfelelő ELNEVEZÉSEK vannak
+  const coll = collection(db, "notes");
+  const q = query(coll, orderBy("ts", "desc"));
+
+  // Firestore -> UI (élő szinkron)
+  onSnapshot(q, (snap) => {
+    state.notes = snap.docs.map(d => {
+      const data = d.data();
+      return { id: d.id, text: data.text, ts: data.ts };
+    });
+    render();
+  });
+
+  // UI -> Firestore
+  window.addNote = async (text) => {
+    text = (text || "").trim(); if (!text) return;
+    await addDoc(coll, { text, ts: Date.now() });
+    document.getElementById('input').value = '';
+    document.getElementById('input').focus();
+  };
+  window.updateNote = async (id, newText) =>
+    updateDoc(doc(db, "notes", id), { text: (newText || "").trim() });
+  window.deleteNote = async (id) =>
+    deleteDoc(doc(db, "notes", id));
+  window.clearAll = async () => {
+    if (!confirm('Biztosan törlöd az összes jegyzetet?')) return;
+    await Promise.all(state.notes.map(n => deleteDoc(doc(db, "notes", n.id))));
+  };
+</script>
+
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
   import {
     getFirestore, collection, addDoc, deleteDoc, updateDoc, doc,
@@ -242,4 +293,5 @@
 </script>
 </body>
 </html>
+
 
